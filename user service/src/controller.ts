@@ -55,3 +55,35 @@ export const registerUser = async (req: any, res: any) => {
 		});
 	}
 };
+
+export const loginUser = async (req: any, res: any) => {
+	const { email, password } = req.body;
+
+	const user = await User.findOne({ email });
+
+	if (!user) {
+		res.status(404).json({
+			message: "❌ User doesn't exist",
+		});
+		return;
+	}
+
+	const passwordMatches = await bcrypt.compare(password, user.password);
+
+	if (!passwordMatches) {
+		res.status(400).json({
+			message: "❌ Invalid Password",
+		});
+		return;
+	}
+
+	const token = jwt.sign({ _id: user._id }, process.env.JWT_SEC as string, {
+		expiresIn: "3d",
+	});
+
+	res.status(200).json({
+		message: "✅ Logged in successfully",
+		user,
+		token,
+	});
+};
