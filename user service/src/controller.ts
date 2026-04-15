@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { User } from "./model.js";
+import { type AuthenticatedRequest } from "./middleware.js";
 
 export const registerUser = async (req: any, res: any) => {
 	try {
@@ -86,4 +87,9 @@ export const loginUser = async (req: any, res: any) => {
 		user,
 		token,
 	});
+};
+
+export const myProfile = async (req: AuthenticatedRequest, res: any) => {
+	const user = req.user;
+	res.status(200).json(user);
 };
