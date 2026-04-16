@@ -2,9 +2,9 @@ import { type NextFunction, type Request, type Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { type IUser, User } from "./model.js";
 
-type userProperty = Omit<IUser, "password">;
 // `req` object may or may not contain extra `user` property at the end of the middleware.
 // So append `user` type to the base `Request` type.
+type userProperty = Omit<IUser, "password">;
 export interface AuthenticatedRequest extends Request {
 	user?: userProperty | null;
 }
