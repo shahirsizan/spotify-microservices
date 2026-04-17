@@ -171,3 +171,29 @@ export const addThumbnail = async (req: AuthenticatedRequest, res: any) => {
 		song: result[0],
 	});
 };
+
+export const deleteSong = async (req: AuthenticatedRequest, res: any) => {
+	if (req.user?.role !== "admin") {
+		res.status(401).json({
+			message: "❌ You are not admin",
+		});
+		return;
+	}
+
+	const { id } = req.params;
+
+	const song = await sql`SELECT * FROM songs WHERE id = ${id}`;
+
+	if (song.length === 0) {
+		res.status(404).json({
+			message: "❌ No song with this id",
+		});
+		return;
+	}
+
+	await sql`DELETE FROM songs WHERE id = ${id}`;
+
+	res.json({
+		message: "✅ Song deleted successfully",
+	});
+};
