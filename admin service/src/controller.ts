@@ -1,6 +1,7 @@
 import cloudinary from "cloudinary";
 import getBuffer from "./config/dataUri.js";
 import { sql } from "./index.js";
+import type { Request } from "express";
 
 interface IUser {
 	_id: string;
@@ -12,7 +13,7 @@ interface IUser {
 
 export interface AuthenticatedRequest extends Request {
 	user?: IUser | null;
-	file?: Express.Multer.File | null;
+	file?: Express.Multer.File | undefined;
 }
 
 export const addAlbum = async (req: AuthenticatedRequest, res: any) => {

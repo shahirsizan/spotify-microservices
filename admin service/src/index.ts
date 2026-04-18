@@ -24,5 +24,9 @@ app.use("/api/v1", adminRoutes);
 
 app.listen(port, async () => {
 	console.log(`✅ Admin service running on port ${port}`);
-	await initDB(sql);
+	try {
+		await initDB(sql);
+	} catch (error: any) {
+		console.error(error.message);
+	}
 });
