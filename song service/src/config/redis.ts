@@ -8,11 +8,22 @@ export const redisClient = createClient({
 redisClient.on("error", (err) => console.log("❌ Redis Client Error: ", err));
 
 export const connectRedis = async () => {
+	// In a development environment with "Hot Reloading" (like nodemon),
+	// the index.ts might re-run frequently. If connect() is called on a client
+	// that is already connected, it will throw an error.
+	if (redisClient.isOpen) {
+		return;
+	}
+
 	try {
 		await redisClient.connect();
-		console.log("✅ Connected to Redis Stack (Port 6379)");
-	} catch (error) {
-		console.error("❌ Could not connect to Redis: ");
+		// Explicitly ask Redis if it is alive
+		const pingResponse = await redisClient.ping();
+		if (pingResponse === "PONG") {
+			console.log("✅ Connected & Pinged Redis Stack successfully");
+		}
+	} catch (error: any) {
+		console.error("❌ Could not connect to Redis: ", error.message);
 		throw error;
 	}
 };
