@@ -29,7 +29,7 @@ export const registerUser = async (req: any, res: any) => {
 			{ _id: user._id },
 			process.env.JWT_SEC as string,
 			{
-				expiresIn: "3d",
+				expiresIn: "1d",
 			},
 		);
 
