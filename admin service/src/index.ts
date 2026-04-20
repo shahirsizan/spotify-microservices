@@ -5,6 +5,7 @@ import adminRoutes from "./route.js";
 import cloudinary, { type ConfigOptions } from "cloudinary";
 import cors from "cors";
 import { neon } from "@neondatabase/serverless";
+import { connectRedis } from "./config/redis.js";
 dotenv.config();
 
 const app = express();
@@ -23,9 +24,10 @@ export const sql = neon(process.env.DB_URL as string);
 app.use("/api/v1", adminRoutes);
 
 app.listen(port, async () => {
-	console.log(`✅ Admin service running on port ${port}`);
 	try {
 		await initDB(sql);
+		await connectRedis();
+		console.log(`✅ Admin service running on port ${port}`);
 	} catch (error: any) {
 		console.error(error.message);
 	}

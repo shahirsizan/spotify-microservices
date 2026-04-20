@@ -1,0 +1,6 @@
+1. Caching ✅
+2. Rate limiting
+3. Idempotency
+4. Saga pattern for atomic transactions of different consecutive service calls 
+    (Ex: 1. cloudinary file upload, 2. sql table update. ALL OR NONE)
+5. 

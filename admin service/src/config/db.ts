@@ -26,7 +26,7 @@ export const initDB = async (sql: NeonQueryFunction<any, any>) => {
           description VARCHAR(255) NOT NULL,
           thumbnail VARCHAR(255),
           audio VARCHAR(255) NOT NULL,
-          album_id INTEGER REFERENCES albums(id) ON DELETE SET NULL,
+          album_id INTEGER REFERENCES albums(id) ON DELETE CASCADE,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`,
 			];
 		});
