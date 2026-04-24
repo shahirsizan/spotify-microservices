@@ -88,9 +88,11 @@ export const getAllSongsOfAlbum = async (req: reqType, res: any) => {
 		}
 
 		songsOfAlbum = await sql`
-		SELECT albums.title as album_title, albums.description as album_desc, songs.* 
+		SELECT albums.id as album_id, albums.title as album_title, albums.description as album_desc, albums.thumbnail as album_thumb, songs.* 
 		from albums left join songs on albums.id = songs.album_id
 		where albums.id = ${id}`;
+
+		// console.log("songsOfAlbum: ", songsOfAlbum);
 
 		if (songsOfAlbum.length === 0) {
 			return res
@@ -101,8 +103,15 @@ export const getAllSongsOfAlbum = async (req: reqType, res: any) => {
 		// format the response
 		const response = {
 			songs: songsOfAlbum,
-			album: songsOfAlbum[0]?.album_title,
+			album: {
+				album_id: songsOfAlbum[0]?.album_id,
+				album_title: songsOfAlbum[0]?.album_title,
+				album_desc: songsOfAlbum[0]?.album_desc,
+				album_thumb: songsOfAlbum[0]?.album_thumb,
+			},
 		};
+
+		// console.log("response: ", response);
 
 		if (redisClient.isReady) {
 			await redisClient.set(
