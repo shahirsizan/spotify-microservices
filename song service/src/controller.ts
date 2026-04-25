@@ -147,7 +147,16 @@ export const getSingleSong = async (req: reqType, res: any) => {
 		// 	}
 		// }
 
-		song = await sql`SELECT * FROM songs WHERE id = ${req.params.id}`;
+		song = await sql`SELECT albums.title as album_title, songs.* 
+			FROM songs left join albums on songs.album_id=albums.id 
+			WHERE songs.id = ${req.params.id}`;
+		/***
+		 * If you write : WHERE id = ${req.params.id};
+		 * You'll get error:
+			 * {
+    			"message": "column reference \"id\" is ambiguous"
+				}
+			 */
 
 		if (song.length == 0) {
 			res.status(404).json({ message: "❌ No song found with given id" });
