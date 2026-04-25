@@ -10,9 +10,9 @@ export const getAllAlbums = async (req: reqType, res: any) => {
 		let albums;
 		const CACHE_EXPIRY = 1800; // 30 minutes
 
-		if (redisClient.isReady) {
-			albums = await redisClient.get("albums");
-		}
+		// if (redisClient.isReady) {
+		// 	albums = await redisClient.get("albums");
+		// }
 
 		if (albums) {
 			console.log("✅ Cache hit.");
@@ -43,9 +43,9 @@ export const getAllSongs = async (req: reqType, res: any) => {
 		let songs;
 		const CACHE_EXPIRY = 1800; // 30 minutes
 
-		if (redisClient.isReady) {
-			songs = await redisClient.get("songs");
-		}
+		// if (redisClient.isReady) {
+		// 	songs = await redisClient.get("songs");
+		// }
 
 		if (songs) {
 			console.log("✅ Cache hit.");
@@ -53,7 +53,9 @@ export const getAllSongs = async (req: reqType, res: any) => {
 			return;
 		} else {
 			console.log("⚠️ Cache miss.");
-			songs = await sql`SELECT * FROM songs`;
+			songs =
+				await sql`SELECT albums.id as album_id, albums.title as album_title, songs.* 
+				FROM songs left join albums on songs.album_id = albums.id`;
 
 			if (redisClient.isReady) {
 				await redisClient.set("songs", JSON.stringify(songs), {
@@ -78,14 +80,14 @@ export const getAllSongsOfAlbum = async (req: reqType, res: any) => {
 
 		let songsOfAlbum;
 
-		if (redisClient.isReady) {
-			let songsOfAlbum = await redisClient.get(`album_songs_${id}`);
-			if (songsOfAlbum) {
-				console.log("✅ Cache hit");
-				res.status(200).json(JSON.parse(songsOfAlbum));
-				return;
-			}
-		}
+		// if (redisClient.isReady) {
+		// 	let songsOfAlbum = await redisClient.get(`album_songs_${id}`);
+		// 	if (songsOfAlbum) {
+		// 		console.log("✅ Cache hit");
+		// 		res.status(200).json(JSON.parse(songsOfAlbum));
+		// 		return;
+		// 	}
+		// }
 
 		songsOfAlbum = await sql`
 		SELECT albums.id as album_id, albums.title as album_title, albums.description as album_desc, albums.thumbnail as album_thumb, songs.* 
@@ -136,14 +138,14 @@ export const getSingleSong = async (req: reqType, res: any) => {
 		const CACHE_EXPIRY = 1800; // 30 minutes
 		let song;
 
-		if (redisClient.isReady) {
-			song = await redisClient.get(`song_${req.params?.id}`);
-			if (song) {
-				console.log("✅ Cache hit");
-				res.status(200).json(JSON.parse(song));
-				return;
-			}
-		}
+		// if (redisClient.isReady) {
+		// 	song = await redisClient.get(`song_${req.params?.id}`);
+		// 	if (song) {
+		// 		console.log("✅ Cache hit");
+		// 		res.status(200).json(JSON.parse(song));
+		// 		return;
+		// 	}
+		// }
 
 		song = await sql`SELECT * FROM songs WHERE id = ${req.params.id}`;
 
