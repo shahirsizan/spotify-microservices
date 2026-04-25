@@ -15,7 +15,7 @@ const App = () => {
 					<Route path="/album/:id" element={<Album />} />
 					<Route path="/playlist" element={<PlayList />} />
 					<Route path="/admin/dashboard" element={<Admin />} />
-					<Route path="/login" element={<Home />} />
+					<Route path="/login" element={<Login />} />
 					<Route path="/register" element={<Register />} />
 				</Routes>
 			</BrowserRouter>
