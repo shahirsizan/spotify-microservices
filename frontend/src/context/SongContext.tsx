@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Cloudinary, CloudinaryImage } from "@cloudinary/url-gen";
 import React, {
 	createContext,
 	ReactNode,
@@ -45,6 +46,7 @@ interface SongContextType {
 	prevSong: () => void;
 	albumSong: Song[];
 	albumData: Album | null;
+	cloudinaryImageInitializer: (songThumbnail: string) => CloudinaryImage;
 }
 
 /***
@@ -67,12 +69,22 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
 	const [song, setSong] = useState<Song | null>(null);
 	const [songs, setSongs] = useState<Song[]>([]);
+	const [index, setIndex] = useState<number>(0);
 	const [albumData, setAlbumData] = useState<Album | null>(null);
 	const [albumSong, setAlbumSong] = useState<Song[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [selectedSong, setSelectedSong] = useState<string | null>(null);
 	const [isPlaying, setIsPlaying] = useState<boolean>(false);
 	const [albums, setAlbums] = useState<Album[]>([]);
+
+	// initialize cloudinary image component
+	const cloudinaryImageInitializer = useCallback((songThumbnail: string) => {
+		const cloudinaryInstance = new Cloudinary({
+			cloud: { cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME },
+		});
+		const cloudniaryImageObj = cloudinaryInstance.image(songThumbnail);
+		return cloudniaryImageObj;
+	}, []);
 
 	// ✅
 	const fetchSongs = useCallback(async () => {
@@ -187,8 +199,9 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 		fetchAlbums();
 	}, []);
 
+	// ✅
 	const fetchSingleSong = useCallback(async () => {
-		// fetchSongs() call in useEffect will select a song at the very beginning
+		// `selectedSong` state is set in `fetchSongs()` in a useEffect at the very beginning.
 		if (!selectedSong) {
 			return;
 		}
@@ -197,29 +210,26 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			const { data } = await axios.get<Song>(
 				`${server}/api/v1/song/${selectedSong}`,
 			);
+
+			console.log("✅ data in fetchSingleSong(): ", data);
 			setSong(data);
 		} catch (error) {
-			console.log(error);
+			console.log("❌ Error in fetchSingleSong(): ", error);
 		}
 	}, [selectedSong]);
 
-	const [index, setIndex] = useState<number>(0);
-
+	// ✅
 	const nextSong = useCallback(() => {
-		if (index === songs.length - 1) {
-			setIndex(0);
-			setSelectedSong(songs[0]?.id.toString());
-		} else {
-			setIndex((prevIndex) => prevIndex + 1);
-			setSelectedSong(songs[index + 1]?.id.toString());
-		}
+		const updatedIdx = (index + 1) % songs.length;
+		setIndex(updatedIdx);
+		setSelectedSong(songs[updatedIdx]?.id.toString());
 	}, [index, songs]);
 
+	// ✅
 	const prevSong = useCallback(() => {
-		if (index > 0) {
-			setIndex((prev) => prev - 1);
-			setSelectedSong(songs[index - 1]?.id.toString());
-		}
+		const updatedIdx = (index - 1 + songs.length) % songs.length;
+		setIndex(updatedIdx);
+		setSelectedSong(songs[updatedIdx]?.id.toString());
 	}, [index, songs]);
 
 	// ✅
@@ -300,6 +310,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			albumSong,
 			fetchSongs,
 			fetchAlbums,
+			cloudinaryImageInitializer,
 		}),
 		[
 			song,
@@ -312,6 +323,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			albumSong,
 			nextSong,
 			prevSong,
+			cloudinaryImageInitializer,
 		], // Only updates when these dependencies change
 	);
 
