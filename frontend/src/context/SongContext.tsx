@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
 import { Cloudinary, CloudinaryImage } from "@cloudinary/url-gen";
 import React, {
@@ -38,6 +40,7 @@ interface SongContextType {
 	isPlaying: boolean;
 	setIsPlaying: (value: boolean) => void;
 	loading: boolean;
+	isError: boolean;
 	fetchSingleSong: () => Promise<void>;
 	fetchAlbumsongs: (id: string) => Promise<void>;
 	fetchSongs: () => Promise<void>;
@@ -76,6 +79,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 	const [selectedSong, setSelectedSong] = useState<string | null>(null);
 	const [isPlaying, setIsPlaying] = useState<boolean>(false);
 	const [albums, setAlbums] = useState<Album[]>([]);
+	const [isError, setIsError] = useState<boolean>(false);
 
 	// initialize cloudinary image component
 	const cloudinaryImageInitializer = useCallback((songThumbnail: string) => {
@@ -136,6 +140,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			setIsPlaying(false);
 		} catch (error) {
 			console.error("❌ fetchSongs error: ", error);
+			setIsError(true);
 		} finally {
 			setLoading(false);
 		}
@@ -189,6 +194,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			// console.log("✅ mappedData in frontend context: ", mappedData);
 		} catch (error) {
 			console.log("❌ fetchAlbums error: ", error);
+			setIsError(true);
 		} finally {
 			setLoading(false);
 		}
@@ -300,6 +306,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			isPlaying,
 			setIsPlaying,
 			loading,
+			isError,
 			albums,
 			fetchSingleSong,
 			song,
