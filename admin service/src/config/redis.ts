@@ -2,7 +2,7 @@ import { createClient } from "redis";
 
 // Use `localhost` because my app is local, but Redis PORT is mapped to my machine
 export const redisClient = createClient({
-	url: process.env.REDIS_URL || "redis://localhost:6379",
+	url: process.env.REDIS_URL || "redis://localhost:6380",
 });
 
 redisClient.on("error", (err) => console.log("❌ Redis Client Error: ", err));
