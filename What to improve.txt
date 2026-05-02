@@ -1,4 +1,6 @@
 1. Caching ✅
+1. jwt blacklisting in backend after user logs out. If the server blacklists a token 
+    (e.g., due to a password change on another device), the React app should automatically kick the user out.
 2. Rate limiting
 3. Idempotency
 4. Saga pattern for atomic transactions of different consecutive service calls 
