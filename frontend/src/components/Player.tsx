@@ -4,6 +4,7 @@ import { GrChapterNext, GrChapterPrevious } from "react-icons/gr";
 import { FaPause, FaPlay } from "react-icons/fa";
 
 import CloudinaryImage from "./CloudinaryImage";
+import { Spinner } from "./ui/spinner";
 
 const Player = () => {
 	const {
@@ -14,6 +15,7 @@ const Player = () => {
 		setIsPlaying,
 		prevSong,
 		nextSong,
+		loading,
 	} = useSongData();
 
 	const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -67,6 +69,14 @@ const Player = () => {
 	}, [selectedSong]);
 
 	// useEffect(()=>{},[song])
+
+	if (loading) {
+		return (
+			<div className=" bg-yellow-500 flex items-center justify-center text-2xl font-bold">
+				LOADING SONG...
+			</div>
+		);
+	}
 
 	return (
 		<div className="PLAYER">
