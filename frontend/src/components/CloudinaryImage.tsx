@@ -1,10 +1,12 @@
 import { useSongData } from "@/context/SongContext";
 import { AdvancedImage } from "@cloudinary/react";
+import { twMerge } from "tailwind-merge";
 import React from "react";
 
-const CloudinaryImage: React.FC<{ songThumbnail: string }> = ({
-	songThumbnail,
-}) => {
+const CloudinaryImage: React.FC<{
+	songThumbnail: string;
+	className?: string;
+}> = ({ songThumbnail, className }) => {
 	const { cloudinaryImageInitializer } = useSongData();
 
 	const cloudniaryImageObj = cloudinaryImageInitializer(songThumbnail);
@@ -12,7 +14,10 @@ const CloudinaryImage: React.FC<{ songThumbnail: string }> = ({
 	return (
 		<AdvancedImage
 			cldImg={cloudniaryImageObj}
-			className="rounded w-12 aspect-square object-cover"
+			className={twMerge(
+				"rounded w-12 aspect-square object-cover",
+				className,
+			)}
 			alt=""
 		/>
 	);

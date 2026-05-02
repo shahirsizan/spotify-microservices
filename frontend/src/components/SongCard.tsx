@@ -1,8 +1,6 @@
 import React from "react";
 import { FaBookmark, FaPlay } from "react-icons/fa";
-
-import { Cloudinary } from "@cloudinary/url-gen";
-import { AdvancedImage } from "@cloudinary/react";
+import CloudinaryImage from "./CloudinaryImage";
 
 interface SongCardProps {
 	id: string;
@@ -21,12 +19,6 @@ const SongCard: React.FC<SongCardProps> = ({
 	album_id,
 	album_title,
 }) => {
-	const cloudinaryInstance = new Cloudinary({
-		cloud: { cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME },
-	});
-	// Instantiate an image object using the public_id from NeonDB
-	const cloudinaryImage = cloudinaryInstance.image(thumbnail);
-
 	return (
 		<div className="min-w-[180px] p-2 px-3 rounded cursor-pointer hover:bg-[#ffffff26]">
 			<div className="relative group">
@@ -37,10 +29,9 @@ const SongCard: React.FC<SongCardProps> = ({
 						alt="Default"
 					/>
 				) : (
-					<AdvancedImage
-						cldImg={cloudinaryImage}
+					<CloudinaryImage
+						songThumbnail={thumbnail}
 						className="rounded w-[160px] aspect-square object-cover"
-						alt=""
 					/>
 				)}
 
