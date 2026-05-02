@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import { useUserData } from "../context/UserContext";
+import { useUserData } from "../context/UserContext";
 
 const Login = () => {
 	const [email, setEmail] = useState("");
@@ -8,13 +8,12 @@ const Login = () => {
 
 	const navigate = useNavigate();
 
-	// const { loginUser, btnLoading } = useUserData();
+	const { loginUser, btnLoading } = useUserData();
 
-	// async function submitHandler(e: any) {
-	// 	e.preventDefault();
-
-	// 	loginUser(email, password, navigate);
-	// }
+	const submitHandler = async (e: React.SubmitEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		loginUser(email, password, navigate);
+	};
 
 	return (
 		<div className="h-screen max-h-screen flex items-center justify-center">
@@ -23,7 +22,12 @@ const Login = () => {
 					Login To Spotify
 				</h2>
 
-				<form className="mt-8">
+				<form
+					className="mt-8"
+					onSubmit={(e) => {
+						submitHandler(e);
+					}}
+				>
 					<div className="mb-4">
 						<label
 							htmlFor="emailid"
@@ -60,7 +64,13 @@ const Login = () => {
 						/>
 					</div>
 
-					<button className="auth-btn">Login</button>
+					<button
+						type="submit"
+						disabled={btnLoading}
+						className="auth-btn"
+					>
+						{btnLoading ? "Please Wait..." : "Login"}
+					</button>
 				</form>
 
 				<div className="text-center mt-6">
