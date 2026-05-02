@@ -212,6 +212,8 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			return;
 		}
 
+		setLoading(true);
+
 		try {
 			const { data } = await axios.get<Song>(
 				`${server}/api/v1/song/${selectedSong}`,
@@ -221,6 +223,8 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			setSong(data);
 		} catch (error) {
 			console.log("❌ Error in fetchSingleSong(): ", error);
+		} finally {
+			setLoading(false);
 		}
 	}, [selectedSong]);
 
