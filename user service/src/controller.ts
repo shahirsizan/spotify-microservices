@@ -33,9 +33,12 @@ export const registerUser = async (req: any, res: any) => {
 			},
 		);
 
+		const userObj = user.toObject();
+		delete userObj.password;
+
 		res.status(201).json({
 			message: "✅ User Registered",
-			user,
+			userObj,
 			token,
 		});
 
@@ -82,14 +85,18 @@ export const loginUser = async (req: any, res: any) => {
 		expiresIn: "3d",
 	});
 
+	const userObj = user.toObject();
+	delete userObj.password;
+
 	res.status(200).json({
 		message: "✅ Logged in successfully",
-		user,
+		userObj,
 		token,
 	});
 };
 
 export const myProfile = async (req: AuthenticatedRequest, res: any) => {
 	const user = req.user;
+	console.log("user in myProfile(): ", user);
 	res.status(200).json(user);
 };

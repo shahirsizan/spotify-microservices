@@ -37,9 +37,11 @@ export const isAuth = async (
 		}
 
 		const userId = decodedValue._id;
-		const user = await User.findById(userId).select("-password");
+		const user = await User.findById(userId);
+		const userObj = user?.toObject();
+		delete userObj?.password;
 
-		if (!user) {
+		if (!userObj) {
 			res.status(403).json({
 				message: "❌ User Not found. Please Login",
 			});
@@ -48,7 +50,7 @@ export const isAuth = async (
 		}
 
 		// Append `user` object to `request` and delegate to next controller
-		req.user = user;
+		req.user = userObj;
 
 		next();
 	} catch (error) {
