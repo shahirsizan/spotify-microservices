@@ -72,7 +72,10 @@ export const loginUser = async (req: any, res: any) => {
 		return;
 	}
 
-	const passwordMatches = await bcrypt.compare(password, user.password);
+	const passwordMatches = await bcrypt.compare(
+		password,
+		user.password as string,
+	);
 
 	if (!passwordMatches) {
 		res.status(400).json({
@@ -97,6 +100,44 @@ export const loginUser = async (req: any, res: any) => {
 
 export const myProfile = async (req: AuthenticatedRequest, res: any) => {
 	const user = req.user;
-	console.log("user in myProfile(): ", user);
+	console.log("userService -> myProfile() -> user: ", user);
 	res.status(200).json(user);
+};
+
+export const addToPlaylist = async (
+	req: AuthenticatedRequest & { params: { id: string } },
+	res: any,
+) => {
+	const userId = req.user?._id;
+	const user = await User.findById(userId);
+
+	if (!user) {
+		res.status(404).json({
+			message: "❌ NO user with this id",
+		});
+		return;
+	}
+
+	// if already saved, remove
+	if (user?.playlist.includes(req.params.id)) {
+		const index = user.playlist.indexOf(req.params.id);
+		user.playlist.splice(index, 1);
+		await user.save();
+
+		res.json({
+			message: "✅ Song removed from playlist",
+		});
+		return;
+	}
+
+	// if not saved, include
+	user.playlist.push(req.params.id);
+	await user.save();
+
+	res.status(201).json({
+		message: "✅ Song added to playList",
+	});
+
+	//⚠️ EI CONTROLLER ER KAJ COMPLETE KORSI. EKHON LOADING STATE TA THIK KORTE HOBE.
+	// AMI SONG SAVE KORLE WHOLE PAGE RELOAD HOCCHE. RESOLVE THE ISSUE
 };

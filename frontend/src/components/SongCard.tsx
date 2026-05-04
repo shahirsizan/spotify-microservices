@@ -1,6 +1,8 @@
 import React from "react";
 import { FaBookmark, FaPlay } from "react-icons/fa";
 import CloudinaryImage from "./CloudinaryImage";
+import { useUserData } from "@/context/UserContext";
+import { useSongData } from "@/context/SongContext";
 
 interface SongCardProps {
 	id: string;
@@ -19,8 +21,17 @@ const SongCard: React.FC<SongCardProps> = ({
 	album_id,
 	album_title,
 }) => {
+	const { addToPlaylist, isAuthenticated, addToPlaylistLoading } =
+		useUserData();
+
+	const { setSelectedSong, setIsPlaying } = useSongData();
+
+	const saveToPlayListHanlder = () => {
+		addToPlaylist(id);
+	};
+
 	return (
-		<div className="min-w-[180px] p-2 px-3 rounded cursor-pointer hover:bg-[#ffffff26]">
+		<div className="SONGCARD min-w-[180px] p-2 px-3 rounded cursor-pointer hover:bg-[#ffffff26]">
 			<div className="relative group">
 				{thumbnail == null ? (
 					<img
@@ -36,13 +47,27 @@ const SongCard: React.FC<SongCardProps> = ({
 				)}
 
 				<div className="flex gap-2">
-					<button className="absolute bottom-2 right-14 bg-green-500 text-black p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer">
+					<button
+						onClick={() => {
+							setSelectedSong(id);
+							setIsPlaying(true);
+						}}
+						className="absolute bottom-2 right-14 bg-green-500 text-black p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+					>
 						<FaPlay />
 					</button>
 
-					<button className="absolute bottom-2 right-2 bg-green-500 text-black p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-						<FaBookmark />
-					</button>
+					{isAuthenticated && (
+						<button
+							disabled={addToPlaylistLoading}
+							className="absolute bottom-2 right-2 bg-green-500 text-black p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+							onClick={() => {
+								saveToPlayListHanlder();
+							}}
+						>
+							<FaBookmark />
+						</button>
+					)}
 				</div>
 			</div>
 
