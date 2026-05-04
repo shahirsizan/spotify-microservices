@@ -52,6 +52,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [btnLoading, setBtnLoading] = useState(false);
 
+	// ✅
 	const registerUser = useCallback(
 		async (
 			name: string,
@@ -123,6 +124,45 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 		[],
 	);
 
+	// ✅
+	const logoutUser = async () => {
+		// localStorage.removeItem("token"); will also work. But we prefer erasing every info about the user
+		localStorage.clear();
+		setUser(null);
+		setIsAuthenticated(false);
+
+		toast.success("✅ User Logged Out");
+	};
+
+	const addToPlaylist = async (id: string) => {
+		// state to render loading spinner in the `add to playlist` button upon press
+		setAddToPlaylistLoading(true);
+
+		try {
+			const { data } = await axios.post(
+				`${userServer}/api/v1/song/${id}`,
+				{},
+				{
+					headers: {
+						token: localStorage.getItem("token"),
+					},
+				},
+			);
+
+			console.log("✅ addToPlaylist() data: ", data);
+			toast.success(data.message);
+			// fetch the user again to get the updated user
+			// fetchUser();
+		} catch (error: any) {
+			toast.error(
+				error.response?.data?.message ||
+					"❌ An Error Occured in addToPlaylist()",
+			);
+		} finally {
+			setAddToPlaylistLoading(false);
+		}
+	};
+
 	async function fetchUser() {
 		setLoading(true);
 
@@ -147,53 +187,18 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 		fetchUser();
 	}, []);
 
-	async function logoutUser() {
-		// localStorage.removeItem("token"); will also work. But we prefer erasing every info about the user
-		localStorage.clear();
-		setUser(null);
-		setIsAuthenticated(false);
-
-		toast.success("✅ User Logged Out");
-	}
-
-	async function addToPlaylist(id: string) {
-		// state to render loading spinner in the `add to playlist` button upon press
-		setAddToPlaylistLoading(true);
-
-		try {
-			const { data } = await axios.post(
-				`${userServer}/api/v1/song/${id}`,
-				{},
-				{
-					headers: {
-						token: localStorage.getItem("token"),
-					},
-				},
-			);
-
-			console.log(`✅ Song ${id} added to playlist. data: `, data);
-			toast.success(data.message);
-			// fetch the user again to get the `updated playlist` along with user data
-			fetchUser();
-		} catch (error: any) {
-			toast.error(error.response?.data?.message || "❌ An Error Occured");
-		} finally {
-			setAddToPlaylistLoading(false);
-		}
-	}
-
 	return (
 		<UserContext.Provider
 			value={{
 				user,
 				loading,
-				addToPlaylistLoading,
 				isAuthenticated,
 				btnLoading,
 				loginUser,
 				registerUser,
 				logoutUser,
 				addToPlaylist,
+				addToPlaylistLoading,
 			}}
 		>
 			{children}
