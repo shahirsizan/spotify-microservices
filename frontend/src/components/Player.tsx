@@ -6,7 +6,7 @@ import { FaPause, FaPlay } from "react-icons/fa";
 import CloudinaryImage from "./CloudinaryImage";
 import { Spinner } from "./ui/spinner";
 
-const Player = () => {
+const Player = React.memo(() => {
 	const {
 		song,
 		fetchSingleSong,
@@ -15,7 +15,7 @@ const Player = () => {
 		setIsPlaying,
 		prevSong,
 		nextSong,
-		loading,
+		playerLoading,
 	} = useSongData();
 
 	const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -63,23 +63,53 @@ const Player = () => {
 		setProgress(newTime);
 	};
 
+	// Sync the <audio/> elements volume whenever the song changes.
+	// without this, after song change, the volume bar and the actual volume will be out of sync.
+	// this will run only when the song itself changes. Not on every render.
+	// for every re-renders, we have `volumeChange` event listener
+	useEffect(() => {
+		if (audioRef.current) {
+			audioRef.current.volume = volume;
+		}
+	}, [song]);
+
 	// trigger `fetchSingleSong()` to fetch that song when clicked
 	useEffect(() => {
+		console.log("called...");
+
 		fetchSingleSong();
 	}, [selectedSong]);
 
-	// useEffect(()=>{},[song])
-
-	if (loading) {
+	/***
+	 * Never use an early return like below for `loading` states in a component that needs to persist media.
+	 * Instead, use conditional rendering inside the main return or overlay the loading indicator.
+	 * 
+	 * Here's what happens:
+	 * 	1. Navigation occurs: You click the back/forward button.
+		2. State Change: The new page triggers a fetch call. setLoading(true) is called in the Context.
+		3. The Wipeout: The Player component sees loading is true. It executes the if (loading) branch.
+		4. Audio Destruction: Because you returned a completely different div, the previous return statement (which contained your <audio> tag) is destroyed. The browser immediately stops the music because the element that was playing it no longer exists in the DOM.
+		5. The Reset: When loading becomes false again, the <audio> tag is recreated from scratch, starting the song from 0:00.
+	 * 
+	 * The Solution: Persistent Audio
+			To fix this, you must ensure the <audio> element stays in the DOM regardless of whether you are fetching new data.
+	 * if (playerLoading) {
 		return (
 			<div className=" bg-yellow-500 flex items-center justify-center text-2xl font-bold">
 				LOADING SONG...
 			</div>
 		);
 	}
+	 */
 
 	return (
 		<div className="PLAYER">
+			{/* Show a small overlay/spinner instead of hiding the whole player */}
+			{playerLoading && !song && (
+				<div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
+					<Spinner />
+				</div>
+			)}
 			{song && (
 				<div className="h-[10%] bg-black flex justify-between items-center text-white px-4">
 					{/* LEFT */}
@@ -170,6 +200,6 @@ const Player = () => {
 			)}
 		</div>
 	);
-};
+});
 
 export default Player;
