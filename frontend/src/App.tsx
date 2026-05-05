@@ -1,37 +1,51 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, replace } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import { useUserData } from "./context/UserContext";
 import { Spinner } from "./components/ui/spinner";
 import Register from "./pages/Register";
+import Album from "./pages/Album";
+import Layout from "./components/Layout";
+import { Navigate } from "react-router-dom";
 
 const App = () => {
-	/***
-	 * {loading ? (
-				<Spinner />
-			) : (<BrowserRouter> here)}
-	 */
 	const { isAuthenticated, loading } = useUserData();
 	return (
-		<>
+		<BrowserRouter>
 			{loading ? (
 				<Spinner />
 			) : (
-				<BrowserRouter>
-					<Routes>
+				<Routes>
+					{/* PUBLIC/AUTH ROUTES (No Layout) */}
+					<Route
+						path="/login"
+						element={
+							isAuthenticated ? (
+								<Navigate to="/" replace />
+							) : (
+								<Login />
+							)
+						}
+					/>
+					<Route
+						path="/register"
+						element={
+							isAuthenticated ? (
+								<Navigate to="/" replace />
+							) : (
+								<Register />
+							)
+						}
+					/>
+
+					{/* PROTECTED APP ROUTES (With Layout) */}
+					<Route element={<Layout />}>
 						<Route path="/" element={<Home />} />
-						<Route
-							path="/login"
-							element={isAuthenticated ? <Home /> : <Login />}
-						/>
-						<Route
-							path="/register"
-							element={isAuthenticated ? <Home /> : <Register />}
-						/>
-					</Routes>
-				</BrowserRouter>
+						<Route path="/album/:id" element={<Album />} />
+					</Route>
+				</Routes>
 			)}
-		</>
+		</BrowserRouter>
 	);
 };
 

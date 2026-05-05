@@ -12,7 +12,7 @@ import React, {
 	useState,
 } from "react";
 
-const server = "http://localhost:8000";
+const songServer = "http://localhost:8000";
 
 export interface Song {
 	id: string;
@@ -40,6 +40,9 @@ interface SongContextType {
 	isPlaying: boolean;
 	setIsPlaying: (value: boolean) => void;
 	loading: boolean;
+	setLoading: (value: boolean) => void;
+	playerLoading: boolean;
+	setPlayerLoading: (value: boolean) => void;
 	isError: boolean;
 	fetchSingleSong: () => Promise<void>;
 	fetchAlbumsongs: (id: string) => Promise<void>;
@@ -47,7 +50,7 @@ interface SongContextType {
 	fetchAlbums: () => Promise<void>;
 	nextSong: () => void;
 	prevSong: () => void;
-	albumSong: Song[];
+	albumSongs: Song[];
 	albumData: Album | null;
 	cloudinaryImageInitializer: (songThumbnail: string) => CloudinaryImage;
 }
@@ -74,8 +77,10 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 	const [songs, setSongs] = useState<Song[]>([]);
 	const [index, setIndex] = useState<number>(0);
 	const [albumData, setAlbumData] = useState<Album | null>(null);
-	const [albumSong, setAlbumSong] = useState<Song[]>([]);
+	const [albumSongs, setAlbumSongs] = useState<Song[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
+	//⚠️ nicher state diye `player` loading state control korte hobe. Global `loading` state diye na.
+	const [playerLoading, setPlayerLoading] = useState<boolean>(true);
 	const [selectedSong, setSelectedSong] = useState<string | null>(null);
 	const [isPlaying, setIsPlaying] = useState<boolean>(false);
 	const [albums, setAlbums] = useState<Album[]>([]);
@@ -96,7 +101,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 
 		try {
 			const { data } = await axios.get<Song[]>(
-				`${server}/api/v1/song/all`,
+				`${songServer}/api/v1/song/all`,
 			);
 
 			/***
@@ -131,13 +136,15 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			 */
 
 			setSongs(data);
-			console.log("data(songs) in frontend: ", data);
+			console.log("✅ fetchSongs() -> data: ", data);
 
-			if (data.length > 0) {
+			// fix: only set song if one isn't already selected
+			if (data.length > 0 && !selectedSong) {
 				setSelectedSong(data[0].id.toString());
 			}
 
-			setIsPlaying(false);
+			// fix: don't call setIsPlaying(false) here. Let the existing state persist.
+			// setIsPlaying(false);
 		} catch (error) {
 			console.error("❌ fetchSongs error: ", error);
 			setIsError(true);
@@ -158,7 +165,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 		try {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const { data } = await axios.get<any[]>(
-				`${server}/api/v1/album/all`,
+				`${songServer}/api/v1/album/all`,
 			);
 			// console.log("✅ data in frontend context: ", data);
 			/***
@@ -212,19 +219,19 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			return;
 		}
 
-		setLoading(true);
+		setPlayerLoading(true);
 
 		try {
 			const { data } = await axios.get<Song>(
-				`${server}/api/v1/song/${selectedSong}`,
+				`${songServer}/api/v1/song/${selectedSong}`,
 			);
 
-			console.log("✅ data in fetchSingleSong(): ", data);
+			console.log("✅ fetchSingleSong() -> data: ", data);
 			setSong(data);
 		} catch (error) {
 			console.log("❌ Error in fetchSingleSong(): ", error);
 		} finally {
-			setLoading(false);
+			setPlayerLoading(false);
 		}
 	}, [selectedSong]);
 
@@ -243,19 +250,17 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 	}, [index, songs]);
 
 	// ✅
-	const fetchAlbumsongs = useCallback(async (id: string) => {
-		setLoading(true);
+	const fetchAlbumsongs = useCallback(
+		async (id: string) => {
+			setLoading(true);
 
-		try {
-			// const { data } = await axios.get<{ songs: Song[]; album: Album }>(
-			// 	`${server}/api/v1/album/${id}`,
-			// );
+			try {
+				const { data } = await axios.get<{
+					songs: Song[];
+					album: Album;
+				}>(`${songServer}/api/v1/album/${id}`);
 
-			const { data } = await axios.get<{ songs: Song[]; album: Album }>(
-				`${server}/api/v1/album/${id}`,
-			);
-
-			/***
+				/***
 			 * `data` is:
 				* {
 					"songs": [
@@ -293,14 +298,17 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 				}
 			 */
 
-			setAlbumData(data.album);
-			setAlbumSong(data.songs);
-		} catch (error) {
-			console.log("❌ fetchAlbumsongs error: ", error);
-		} finally {
-			setLoading(false);
-		}
-	}, []);
+				console.log("✅ fetchAlbumsongs() -> data: ", data);
+				setAlbumData(data.album);
+				setAlbumSongs(data.songs);
+			} catch (error) {
+				console.log("❌ fetchAlbumsongs error: ", error);
+			} finally {
+				setLoading(false);
+			}
+		},
+		[songServer],
+	);
 
 	const valueObj = useMemo(
 		() => ({
@@ -310,6 +318,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			isPlaying,
 			setIsPlaying,
 			loading,
+			playerLoading,
 			isError,
 			albums,
 			fetchSingleSong,
@@ -318,7 +327,7 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			prevSong,
 			fetchAlbumsongs,
 			albumData,
-			albumSong,
+			albumSongs,
 			fetchSongs,
 			fetchAlbums,
 			cloudinaryImageInitializer,
@@ -329,13 +338,14 @@ export const SongProvider: React.FC<{ children: ReactNode }> = ({
 			selectedSong,
 			isPlaying,
 			loading,
+			playerLoading,
 			albums,
 			albumData,
-			albumSong,
+			albumSongs,
 			nextSong,
 			prevSong,
 			cloudinaryImageInitializer,
-		], // Only updates when these dependencies change
+		], // update the object only when the dependencies (states) change
 	);
 
 	return (

@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import Player from "./Player";
@@ -7,14 +8,15 @@ interface LayoutProps {
 	children: ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout = () => {
 	return (
 		<div className="ENTIRESCREEN h-screen">
 			<div className="TOPBOX h-[90%]  flex">
 				<Sidebar />
 				<div className="RIGHTPART w-full m-2 px-2 md:px-6 pt-4 rounded bg-[#121212] text-white overflow-auto lg:w-[75%] lg:ml-0">
 					<Navbar />
-					{children}
+					{/* Outlet renders the matched child route */}
+					<Outlet />
 				</div>
 			</div>
 
