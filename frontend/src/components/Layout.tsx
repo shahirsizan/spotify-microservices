@@ -12,7 +12,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 		<div className="ENTIRESCREEN h-screen">
 			<div className="TOPBOX h-[90%]  flex">
 				<Sidebar />
-				<div className="RIGHTPART w-[100%] m-2 px-6 pt-4 rounded bg-[#121212] text-white overflow-auto lg:w-[75%] lg:ml-0">
+				<div className="RIGHTPART w-full m-2 px-2 md:px-6 pt-4 rounded bg-[#121212] text-white overflow-auto lg:w-[75%] lg:ml-0">
 					<Navbar />
 					{children}
 				</div>

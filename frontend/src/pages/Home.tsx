@@ -7,24 +7,7 @@ import { useSongData } from "@/context/SongContext";
 const Home = () => {
 	const { albums, songs, loading, isError } = useSongData();
 
-	/***
-	 * each of the album: {
-					album_id: item.id.toString(),
-					album_title: item.title,
-					album_desc: item.description,
-					album_thumb: item.thumbnail,
-				}
-	 */
-
 	return (
-		// 		{loading ? (
-		// 				<Spinner className="size-20 font-bold text-blue-800" />
-		// 			) : isError ? (
-		// 				<div className="h-screen flex items-center justify-center bg-red-900 text-white text-2xl font-bold">
-		// 					Error!
-		// 				</div>
-		// 			) : (<Layout> code here)
-		// }
 		<div className="">
 			<Layout>
 				{/* Albums Cards */}

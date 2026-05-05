@@ -6,7 +6,7 @@ import React from "react";
 const CloudinaryImage: React.FC<{
 	songThumbnail: string;
 	className?: string;
-}> = ({ songThumbnail, className }) => {
+}> = React.memo(({ songThumbnail, className }) => {
 	const { cloudinaryImageInitializer } = useSongData();
 
 	const cloudniaryImageObj = cloudinaryImageInitializer(songThumbnail);
@@ -21,6 +21,6 @@ const CloudinaryImage: React.FC<{
 			alt=""
 		/>
 	);
-};
+});
 
 export default CloudinaryImage;

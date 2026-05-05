@@ -175,7 +175,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
 			setUser(data);
 			setIsAuthenticated(true);
-			console.log("✅ fetchUser() data: ", data);
+			// console.log("✅ fetchUser() data: ", data);
 		} catch (error) {
 			console.log("❌ Error in fetchUser(): ", error);
 		} finally {
