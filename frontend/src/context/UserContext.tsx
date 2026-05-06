@@ -150,6 +150,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 			);
 
 			console.log("✅ addToPlaylist() data: ", data);
+			setUser(data.user);
 			toast.success(data.message);
 			// fetch the user again to get the updated user
 			// fetchUser();

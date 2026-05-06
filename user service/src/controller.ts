@@ -126,6 +126,7 @@ export const addToPlaylist = async (
 
 		res.json({
 			message: "✅ Song removed from playlist",
+			user: user,
 		});
 		return;
 	}
@@ -136,6 +137,7 @@ export const addToPlaylist = async (
 
 	res.status(201).json({
 		message: "✅ Song added to playList",
+		user: user,
 	});
 
 	//⚠️ EI CONTROLLER ER KAJ COMPLETE KORSI. EKHON LOADING STATE TA THIK KORTE HOBE.
