@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, replace } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import { useUserData } from "./context/UserContext";
@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Album from "./pages/Album";
 import Layout from "./components/Layout";
 import { Navigate } from "react-router-dom";
+import PlayList from "./pages/PlayList";
 
 const App = () => {
 	const { isAuthenticated, loading } = useUserData();
@@ -42,6 +43,16 @@ const App = () => {
 					<Route element={<Layout />}>
 						<Route path="/" element={<Home />} />
 						<Route path="/album/:id" element={<Album />} />
+						<Route
+							path="/playlist"
+							element={
+								isAuthenticated ? (
+									<PlayList />
+								) : (
+									<Navigate to="/login" replace />
+								)
+							}
+						/>
 					</Route>
 				</Routes>
 			)}
